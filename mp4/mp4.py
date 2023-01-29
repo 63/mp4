@@ -5,7 +5,7 @@ class MP4:
         self.ftyp = ftyp.ftyp()
         self.moov = moov.moov()
 
-class atom:
+class atom_container:
     def __init__(self, size, name, data):
         self.size = size
         self.name = name
@@ -15,12 +15,12 @@ def read_atom(data, offset):
     size = int.from_bytes(data[offset:offset+4], byteorder='big')
     name = data[offset+4:offset+8].decode('utf-8')
     data = data[offset+8:size]
-    return atom(size, name, data)
+    return atom_container(size, name, data)
 
-def read_atoms(data, start, size):
+def read_atoms(data):
     atoms = []
-    offset = start
-    while offset < start + size:
+    offset = 0
+    while offset < len(data):
         atom = read_atom(data, offset)
         atoms.append(atom)
         offset += atom.size
@@ -28,7 +28,7 @@ def read_atoms(data, start, size):
 
 def parse_mp4(data):
     mp4 = MP4()
-    atoms = read_atoms(data, 0, len(data))
+    atoms = read_atoms(data)
     for atom in atoms:
         if atom.name == 'ftyp':
             mp4.ftyp.parse_atom(atom.data)

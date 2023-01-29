@@ -1,15 +1,22 @@
 from mp4 import mp4
+from mp4.atom import atom
+from mp4.atoms import tkhd
 
-class trak:
+class trak(atom):
     def __init__(self):
-        self.tkhd = ''
+        atom.__init__(self)
+        self.tkhd = tkhd.tkhd()
 
     def parse_atom(self, data):
         if len(data) < 8:
             return
-        atoms = mp4.read_atoms(data, 0, len(data))
+        atoms = mp4.read_atoms(data)
         for atom in atoms:
-            print(atom.name)
+            if atom.name == 'tkhd':
+                self.tkhd.parse_atom(atom.data)
+            else:
+                #print(atom.name)
+                pass
     
     def __str__ (self):
-        return f'trak: traks={self.traks}'
+        return f'trak: tkhd={self.tkhd}'
